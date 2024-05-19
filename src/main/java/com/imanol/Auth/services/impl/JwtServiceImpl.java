@@ -15,16 +15,17 @@ public class JwtServiceImpl implements JwtService {
 
     private final String secretToken;
 
-    public JwtServiceImpl(@Value("security.jwt.secret") String secretToken){
+    public JwtServiceImpl(@Value("${jwt.secret}") String secretToken){
         this.secretToken = secretToken;
     }
 
     @Override
     public TokenResponse generateToken(Long userId) {
+        Date expirationDate = new Date(Long.MAX_VALUE);
         String token = Jwts.builder()
                 .setSubject(String.valueOf(userId))
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(36000))
+                .setExpiration(expirationDate)
                 .signWith(SignatureAlgorithm.HS512, this.secretToken)
                 .compact();
         return TokenResponse.builder()

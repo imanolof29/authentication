@@ -35,11 +35,11 @@ public class SecurityConfig {
         httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(request -> request
-                        .requestMatchers("/v1/auth/login").permitAll() // Permitir acceso sin autenticación al endpoint de login
-                        .requestMatchers("/v1/auth/register").permitAll() // Permitir acceso sin autenticación al endpoint de registro
-                        .requestMatchers("/v1/**").authenticated() // Exigir autenticación para otros endpoints bajo /v1
-                        .anyRequest().authenticated()
+                .authorizeHttpRequests(request ->
+                        request.requestMatchers("v1/auth/register", "v1/auth/login")
+                                .permitAll()
+                                .anyRequest()
+                                .authenticated()
                 )
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())

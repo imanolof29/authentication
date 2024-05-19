@@ -27,6 +27,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public TokenResponse createUser(RegisterRequestDto registerRequestDto) {
         return Optional.of(registerRequestDto)
+                .map(this::emailAlreadyExists)
                 .map(this::mapToEntity)
                 .map(userRepository::save)
                 .map(userCreated -> jwtService.generateToken(userCreated.getId()))
@@ -59,7 +60,16 @@ public class AuthServiceImpl implements AuthService {
         return User.builder()
                 .email(registerRequestDto.getEmail())
                 .fullName(registerRequestDto.getFullName())
+                .password(registerRequestDto.getPassword())
+                .role("USER")
                 .build();
+    }
+
+    private RegisterRequestDto emailAlreadyExists(RegisterRequestDto registerRequestDto){
+        if(userRepository.findByEmail(registerRequestDto.getEmail()).isPresent()){
+            throw new RuntimeException("Email already exists");
+        }
+        return registerRequestDto;
     }
 
 }
